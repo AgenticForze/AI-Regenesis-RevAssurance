@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+
+# Secrets and local config
+.env
+.env.*
+secrets/
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Data: never commit raw or customer data
+data/raw/
+data/samples/*.parquet
+spike/data/
+
+# IaC
+cdk.out/
+.terraform/
+*.tfstate*
+
+# Logs
+logs/agent-runs/*.jsonl

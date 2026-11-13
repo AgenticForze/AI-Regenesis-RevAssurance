@@ -1,0 +1,14 @@
+name: Bug
+description: Something does not behave as specified
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: {label: What happened, description: Include case_id or trace_id, never customer data}
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes: {label: Expected behaviour}
+  - type: dropdown
+    id: severity
+    attributes: {label: Severity, options: [Sev1, Sev2, Sev3]}

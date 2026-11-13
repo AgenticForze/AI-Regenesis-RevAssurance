@@ -1,0 +1,13 @@
+name: get_tariff
+version: 1.0.0
+description: Return the tariff effective for a product at a given date, with its source document.
+access: read
+input_schema:
+  type: object
+  required: [product_code, as_of]
+  properties:
+    product_code: {type: string, pattern: "^[A-Z0-9-]{3,32}$"}
+    as_of: {type: string, format: date}
+errors: [NOT_FOUND, AMBIGUOUS]
+limits: {timeout_ms: 2000, cache_ttl_s: 3600}
+allowed_agents: [triage, pricing_contract, verifier]

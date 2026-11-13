@@ -1,0 +1,8 @@
+suite: triage
+dataset: regression
+metrics:
+  macro_f1: {min: 0.85, per_slice: [root_cause, value_band]}
+  ece: {max: 0.05}
+  schema_validity: {min: 1.0}
+  cost_per_case_delta: {max: 0.10}
+gate: {max_metric_drop_points: 1, safety_failures: 0}

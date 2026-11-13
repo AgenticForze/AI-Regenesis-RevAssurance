@@ -1,0 +1,9 @@
+{
+  "name": "gold_vYYYY.MM.N",
+  "uri": "s3://ra-evals/gold/gold_vYYYY.MM.N.jsonl",
+  "sha256": "...",
+  "taxonomy": "tax-v1.0",
+  "counts": {"total": 0, "per_root_cause": {}, "per_control": {}},
+  "kappa": {"root_cause": null, "action": null},
+  "splits": {"regression": "...", "heldout": "..."}
+}

@@ -1,0 +1,5 @@
+env: dev
+region: us-east-1
+secondary_region: us-west-2
+data: synthetic
+bedrock_quota_profile: nonprod

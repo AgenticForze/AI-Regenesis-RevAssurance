@@ -1,0 +1,16 @@
+name: Bolt (task)
+description: One unit-of-work task, sized for a few hours to two days
+labels: [bolt]
+body:
+  - type: input
+    id: task
+    attributes: {label: Task ID, placeholder: T4.06}
+    validations: {required: true}
+  - type: dropdown
+    id: unit
+    attributes:
+      label: Unit
+      options: [U1 Ingestion, U2 Recon, U3 Case mgmt, U4 Triage + RAG, U5 Agents, U6 Assistant, U7 Platform]
+  - type: textarea
+    id: done
+    attributes: {label: Done when, description: Acceptance tests and eval thresholds}

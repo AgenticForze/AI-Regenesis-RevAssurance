@@ -1,0 +1,20 @@
+id: C2
+name: Rating-to-billing
+question: Was every rated event billed at the rated amount?
+left:  {system: S2, entity: rated_usage, grain: event}
+right: {system: S3|S4, entity: invoice_line, grain: line}
+period: billing_period
+match_keys:
+  exact: ["event_id -> source_event_ref"]
+  fallback: [account_key, product_code, billing_period]
+aggregation: many-to-one (events -> invoice line) by account, product, period
+tolerances:
+  amount_per_line: 0.01
+  amount_pct_fx: 0.005
+  time_window_hours: 24
+exclusions: [test_accounts, "PROMO-*"]
+frequency: {batch: per_bill_run, intraday: high_value_only}
+break_types: [missing_right, amount_mismatch, quantity_mismatch, duplicate]
+likely_root_causes: [RC02_price_book_mismatch, RC01_rating_error, RC03_missing_usage, RC10_timing_cutoff]
+owner: RA lead
+status: TBC

@@ -1,0 +1,20 @@
+name: AI quality issue
+description: Wrong recommendation, bad explanation, drift or override cluster
+labels: [ai-quality]
+body:
+  - type: input
+    id: case
+    attributes: {label: Case or trace ID}
+  - type: input
+    id: rootcause
+    attributes: {label: Root-cause class (taxonomy code)}
+  - type: textarea
+    id: details
+    attributes: {label: What was wrong and what the analyst decided}
+  - type: checkboxes
+    id: next
+    attributes:
+      label: Follow-up
+      options:
+        - label: Add as eval case (failing first)
+        - label: Candidate for gold set

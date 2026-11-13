@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "revenue-assurance-ai"
+version = "0.1.0"
+description = "Revenue assurance on Amazon Bedrock: deterministic reconciliation plus a multi-agent exception tier."
+requires-python = ">=3.11"
+dependencies = [
+  "boto3>=1.34",
+  "pydantic>=2.6",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+agents = ["strands-agents", "aws-opentelemetry-distro"]
+
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = ["ra*", "evals*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", ".", ".claude/hooks"]
+
+[tool.ruff]
+line-length = 100

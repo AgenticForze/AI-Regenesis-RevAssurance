@@ -1,0 +1,29 @@
+name: eval-gate
+# Runs on PRs that touch AI behaviour. Wire the harness to Bedrock in Phase 4 (task T4.08).
+on:
+  pull_request:
+    paths:
+      - "src/ra/agents/**"
+      - "prompts/**"
+      - "config/routing/**"
+      - "config/thresholds/**"
+      - "evals/**"
+permissions:
+  contents: read
+  id-token: write      # OIDC to assume the eval role in the Test account
+  pull-requests: write
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      # - uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: arn:aws:iam::<test-account>:role/ra-eval-runner
+      #     aws-region: us-east-1
+      - name: Regression subset, safety suite and cost check
+        run: python -m evals.harness --suite triage --subset regression-100 --gate

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revenue Assurance AI</title>
+<meta name="description" content="Reference architecture and agentic SDLC playbook for reconciling 4 million transactions a day across 10 billing systems with Amazon Bedrock and Claude Code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a ledger. Thin rules, tabular figures, teal for "matched", amber for "breaks". */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --ink: #13222c;
+  --muted: #536571;
+  --line: #d3dde2;
+  --accent: #0d6b66;
+  --accent-soft: #dcefed;
+  --signal: #a8570a;
+  --signal-soft: #f6e8d8;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d151b; --surface: #142029; --ink: #e3ebef; --muted: #98a9b4; --line: #26353f;
+    --accent: #45b8ae; --accent-soft: #15302f; --signal: #eea258; --signal-soft: #33261a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d151b; --surface: #142029; --ink: #e3ebef; --muted: #98a9b4; --line: #26353f;
+  --accent: #45b8ae; --accent-soft: #15302f; --signal: #eea258; --signal-soft: #33261a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-body); }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 600; }
+h3 { font-size: 1.15rem; font-weight: 600; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-size: .88em; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Header */
+header.site { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.brand-mark { width: 22px; height: 22px; border: 2px solid var(--accent); border-radius: 4px; position: relative; }
+.brand-mark::after { content: ""; position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; background: var(--signal); border-radius: 2px; }
+nav ul { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; }
+nav a { color: var(--muted); text-decoration: none; font-size: .92rem; }
+nav a:hover { color: var(--ink); }
+@media (max-width: 860px) { nav { display: none; } }
+
+/* Hero */
+.hero { padding: 64px 0 48px; border-bottom: 1px solid var(--line); }
+.hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+@media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; } }
+.eyebrow { font-family: var(--font-mono); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.hero h1 { font-size: clamp(2.2rem, 4.6vw, 3.4rem); font-weight: 700; }
+.hero h1 em { font-style: normal; color: var(--signal); }
+.lead { font-size: 1.12rem; color: var(--muted); max-width: 58ch; margin-top: 18px; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: var(--radius); font-weight: 600; text-decoration: none; border: 1px solid var(--accent); font-size: .95rem; }
+.btn.primary { background: var(--accent); color: var(--surface); }
+.btn.ghost { color: var(--accent); background: transparent; }
+
+/* Funnel */
+.funnel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 22px 22px 16px; }
+.funnel h3 { font-size: 1rem; }
+.funnel .sub { font-size: .82rem; color: var(--muted); margin-top: 2px; }
+.f-rows { display: grid; gap: 12px; margin-top: 18px; }
+.f-row { display: grid; grid-template-columns: 1fr; gap: 4px; }
+.f-label { display: flex; justify-content: space-between; gap: 12px; font-size: .88rem; }
+.f-label strong { font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-weight: 500; }
+.f-bar { height: 12px; border-radius: 3px; background: var(--accent); }
+.f-bar.break { background: var(--signal); }
+.f-bar.human { background: var(--ink); }
+.f-note { font-size: .78rem; color: var(--muted); margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
+
+/* Sections */
+section.band { padding: 72px 0; border-bottom: 1px solid var(--line); }
+.sec-head { display: grid; grid-template-columns: 220px 1fr; gap: 32px; margin-bottom: 36px; }
+@media (max-width: 760px) { .sec-head { grid-template-columns: 1fr; gap: 10px; } }
+.sec-num { font-family: var(--font-mono); color: var(--muted); font-size: .85rem; padding-top: 8px; }
+.sec-head p { margin-top: 12px; max-width: 64ch; color: var(--muted); }
+
+/* Principles */
+.principles { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
+@media (max-width: 760px) { .principles { grid-template-columns: 1fr; } }
+.principle { padding: 22px 24px 24px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 56px 1fr; gap: 6px 12px; }
+.principle .k { font-family: var(--font-mono); color: var(--accent); font-size: .85rem; grid-row: span 2; padding-top: 3px; }
+.principle p { color: var(--muted); max-width: 52ch; }
+
+/* Architecture */
+.arch { display: grid; grid-template-columns: 1fr 230px; gap: 16px; }
+@media (max-width: 900px) { .arch { grid-template-columns: 1fr; } }
+.layers { display: grid; gap: 10px; }
+.layer { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; grid-template-columns: 190px 1fr; gap: 12px; align-items: start; }
+@media (max-width: 640px) { .layer { grid-template-columns: 1fr; } }
+.layer.ai { border: 2px solid var(--accent); background: var(--accent-soft); }
+.layer h3 { font-size: 1rem; }
+.layer .meta { font-size: .8rem; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: .8rem; border: 1px solid var(--line); background: var(--bg); border-radius: 4px; padding: 3px 8px; }
+.layer.ai .chip { background: var(--surface); }
+.cross { border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 10px; align-content: start; }
+.cross h3 { font-size: .95rem; }
+.cross li { font-size: .88rem; }
+.cross ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.flow-arrow { text-align: center; color: var(--muted); font-size: .75rem; font-family: var(--font-mono); line-height: 1; }
+
+/* Agents */
+.agent-flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: stretch; }
+@media (max-width: 900px) { .agent-flow { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .agent-flow { grid-template-columns: 1fr; } }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; position: relative; }
+.stage .step { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); }
+.stage h3 { font-size: 1rem; margin: 4px 0 6px; }
+.stage p { font-size: .86rem; color: var(--muted); }
+.stage.human { border-color: var(--signal); background: var(--signal-soft); }
+.tier { display: inline-block; font-family: var(--font-mono); font-size: .72rem; padding: 1px 6px; border-radius: 3px; background: var(--accent-soft); color: var(--accent); margin-top: 8px; }
+.stage.human .tier { background: var(--surface); color: var(--signal); }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-top: 22px; }
+
+/* Delivery timeline */
+.timeline { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 10px; overflow-x: auto; }
+.tl-grid { min-width: 720px; display: grid; grid-template-columns: 210px 1fr; row-gap: 10px; }
+.tl-axis { display: grid; grid-template-columns: repeat(36, 1fr); font-family: var(--font-mono); font-size: .72rem; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.tl-axis span { grid-column: span 4; }
+.tl-name { font-size: .9rem; display: flex; flex-direction: column; justify-content: center; }
+.tl-name small { color: var(--muted); font-size: .76rem; }
+.tl-track { display: grid; grid-template-columns: repeat(36, 1fr); align-items: center; background-image: linear-gradient(to right, var(--line) 1px, transparent 1px); background-size: calc(100% / 9) 100%; }
+.tl-bar { height: 14px; border-radius: 7px; background: var(--accent-soft); border: 1px solid var(--accent); position: relative; }
+.tl-bar.ai { background: var(--accent); }
+.tl-bar.release { background: var(--signal-soft); border-color: var(--signal); }
+.tl-gate { font-family: var(--font-mono); font-size: .72rem; color: var(--ink); margin-left: 6px; white-space: nowrap; }
+.tl-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); margin-top: 10px; }
+.sw { display: inline-block; width: 18px; height: 10px; border-radius: 5px; vertical-align: middle; margin-right: 6px; border: 1px solid var(--accent); background: var(--accent-soft); }
+.sw.ai { background: var(--accent); }
+.sw.release { background: var(--signal-soft); border-color: var(--signal); }
+
+/* Engineering */
+.eng { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 900px) { .eng { grid-template-columns: 1fr; } }
+.eng .col { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.eng .col h3 { margin-bottom: 10px; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; font-size: .88rem; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-family: var(--font-mono); font-size: .82rem; text-align: right; font-variant-numeric: tabular-nums; }
+.ids { font-family: var(--font-mono); font-size: .8rem; display: grid; gap: 6px; }
+.ids span { display: flex; align-items: center; gap: 8px; }
+.ids span::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); flex: none; }
+.ids span:last-child::before { background: var(--signal); }
+
+/* Lessons */
+.lessons td:first-child { font-weight: 600; white-space: nowrap; }
+.lessons td:nth-child(2) { color: var(--muted); }
+
+/* Repo */
+.repo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .repo { grid-template-columns: 1fr; } }
+pre { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; overflow-x: auto; font: .82rem/1.55 var(--font-mono); }
+.code-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.copy { font: 500 .8rem var(--font-body); background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+footer { padding: 36px 0 48px; color: var(--muted); font-size: .86rem; }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Revenue Assurance AI</a>
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#approach">Approach</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#agents">Agents</a></li>
+        <li><a href="#delivery">Delivery</a></li>
+        <li><a href="#engineering">Engineering</a></li>
+        <li><a href="#lessons">Lessons</a></li>
+        <li><a href="#repo">Repository</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Reference architecture + agentic SDLC playbook</div>
+        <h1>Reconcile 4 million transactions a day. Let AI work only on the <em>breaks</em>.</h1>
+        <p class="lead">A revenue assurance system for 10 billing and data systems on Amazon Bedrock and AgentCore, delivered with Claude Code. Deterministic rules match the bulk; agents investigate exceptions with evidence; analysts approve every adjustment until the data earns more autonomy.</p>
+        <div class="ctas">
+          <a class="btn primary" href="https://github.com/your-org/revenue-assurance-ai">View the repository</a>
+          <a class="btn ghost" href="#delivery">See the delivery plan</a>
+        </div>
+      </div>
+      <figure class="funnel" aria-labelledby="funnel-title" style="margin:0">
+        <h3 id="funnel-title">Where the work goes on a typical day</h3>
+        <p class="sub">Bar length on a log scale; volumes are planning assumptions</p>
+        <div class="f-rows">
+          <div class="f-row"><div class="f-label"><span>Source records reconciled</span><strong>16,000,000</strong></div><div class="f-bar" style="width:100%"></div></div>
+          <div class="f-row"><div class="f-label"><span>Exceptions sent to AI triage</span><strong>80,000</strong></div><div class="f-bar break" style="width:68%"></div></div>
+          <div class="f-row"><div class="f-label"><span>Agent investigations</span><strong>12,000</strong></div><div class="f-bar break" style="width:56%"></div></div>
+          <div class="f-row"><div class="f-label"><span>Cases needing an analyst decision</span><strong>2,000</strong></div><div class="f-bar human" style="width:46%"></div></div>
+        </div>
+        <p class="f-note">About 98% of records never touch a model. Illustrative model spend: about $1.8K a day, against about $36K if a mid-tier model read every transaction.</p>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band" id="approach">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">01 / Approach</div>
+        <div>
+          <h2>Four rules the design never breaks</h2>
+          <p>Revenue assurance moves money and answers to auditors. These rules keep an AI system inside those constraints at 4M transactions a day.</p>
+        </div>
+      </div>
+      <div class="principles">
+        <div class="principle"><span class="k">R1</span><h3>Rules first, models for exceptions</h3><p>Controls C1 to C9 match records with keys, tolerances and aggregation in Spark and Flink. Only breaks become events for the AI tier.</p></div>
+        <div class="principle"><span class="k">R2</span><h3>Agents propose, people approve</h3><p>Investigators have read-only tools. The single write tool creates a pending proposal; posting to billing or ERP waits for an analyst.</p></div>
+        <div class="principle"><span class="k">R3</span><h3>Evals are the release gate</h3><p>A double-labeled gold set exists before the first agent. No prompt, model or threshold ships if any critical slice regresses.</p></div>
+        <div class="principle"><span class="k">R4</span><h3>Every decision can be replayed</h3><p>One case ID links source records, rule runs, retrieved documents, model calls, versions and the approver in an immutable record.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="architecture">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">02 / Architecture</div>
+        <div>
+          <h2>Six layers, one direction of flow</h2>
+          <p>Each production domain runs in its own AWS account. Workloads have no internet route; every service is reached through VPC endpoints.</p>
+        </div>
+      </div>
+      <div class="arch">
+        <div class="layers">
+          <div class="layer"><div><h3>10 source systems</h3><div class="meta">S1 to S10</div></div><div class="chips"><span class="chip">Mediation</span><span class="chip">Rating</span><span class="chip">Billing A and B</span><span class="chip">CRM</span><span class="chip">Orders</span><span class="chip">Catalog</span><span class="chip">Payments</span><span class="chip">ERP</span><span class="chip">Partner settlement</span></div></div>
+          <div class="flow-arrow" aria-hidden="true">&darr;</div>
+          <div class="layer"><div><h3>Ingestion and contracts</h3><div class="meta">Data Platform account</div></div><div class="chips"><span class="chip">DMS CDC</span><span class="chip">MSK + schema registry</span><span class="chip">AppFlow</span><span class="chip">Transfer Family</span><span class="chip">Glue Data Quality</span></div></div>
+          <div class="flow-arrow" aria-hidden="true">&darr;</div>
+          <div class="layer"><div><h3>Lakehouse</h3><div class="meta">S3 + Apache Iceberg</div></div><div class="chips"><span class="chip">Bronze, raw</span><span class="chip">Silver, canonical</span><span class="chip">Gold, results</span><span class="chip">Lake Formation</span><span class="chip">Redshift Serverless</span></div></div>
+          <div class="flow-arrow" aria-hidden="true">&darr;</div>
+          <div class="layer"><div><h3>Reconciliation engine</h3><div class="meta">~98% matched here</div></div><div class="chips"><span class="chip">EMR Serverless batch</span><span class="chip">Flink intraday</span><span class="chip">Identity map</span><span class="chip">Grouping + priority</span></div></div>
+          <div class="flow-arrow" aria-hidden="true">&darr; exceptions only</div>
+          <div class="layer ai"><div><h3>AI exception tier</h3><div class="meta">AI Platform account</div></div><div class="chips"><span class="chip">Bedrock models</span><span class="chip">Batch inference</span><span class="chip">AgentCore Runtime</span><span class="chip">Gateway + Policy</span><span class="chip">Memory</span><span class="chip">Knowledge Bases</span><span class="chip">Guardrails</span></div></div>
+          <div class="flow-arrow" aria-hidden="true">&darr; pending proposals</div>
+          <div class="layer"><div><h3>Case management</h3><div class="meta">Case Mgmt account</div></div><div class="chips"><span class="chip">Step Functions</span><span class="chip">DynamoDB</span><span class="chip">Evidence with Object Lock</span><span class="chip">Analyst UI</span><span class="chip">Posting service</span></div></div>
+        </div>
+        <aside class="cross" aria-label="Cross-cutting controls">
+          <h3>Across every layer</h3>
+          <ul>
+            <li>OpenTelemetry traces keyed by case ID</li>
+            <li>Central observability and log archive accounts</li>
+            <li>KMS keys, PII tokenization, PrivateLink</li>
+            <li>AgentCore Identity and per-agent tool policy</li>
+            <li>Prompt caching, batch, model routing</li>
+            <li>Warm standby in a second region</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="agents">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">03 / Agents</div>
+        <div>
+          <h2>Specialists gather evidence; a verifier and a person close the case</h2>
+          <p>The supervisor plans and enforces a budget per case. Specialists run in parallel with their own allow-listed tools. Failed verification re-plans at most twice, then hands the case to an analyst with the evidence gathered so far.</p>
+        </div>
+      </div>
+      <div class="agent-flow">
+        <div class="stage"><div class="step">Step 1</div><h3>Triage</h3><p>Root cause, action and confidence for each exception group. Escalates to a stronger model below 0.7.</p><span class="tier">small model</span></div>
+        <div class="stage"><div class="step">Step 2</div><h3>Supervisor</h3><p>Plans two to five steps within 12 calls, 60K tokens and 3 minutes.</p><span class="tier">mid model</span></div>
+        <div class="stage"><div class="step">Step 3</div><h3>Four specialists</h3><p>Ledger evidence, pricing and contract, identity, partner settlement.</p><span class="tier">read-only tools</span></div>
+        <div class="stage"><div class="step">Step 4</div><h3>Root cause + verifier</h3><p>Impact computed by a tool, never the model. Verifier checks citations, numbers and policy.</p><span class="tier">different judge</span></div>
+        <div class="stage human"><div class="step">Step 5</div><h3>Analyst approval</h3><p>Approve, edit or reject. Dual approval above the high threshold.</p><span class="tier">human in the loop</span></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>Model tier</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Triage, extraction, memory summaries</td><td>Small</td><td>High volume, cached prompt prefix, batch where latency allows</td></tr>
+            <tr><td>Supervisor, specialists, explanations</td><td>Mid</td><td>Best cost and quality for multi-step tool use</td></tr>
+            <tr><td>Top 1% by value, verifier disagreement</td><td>Frontier</td><td>Deeper reasoning where the money justifies it</td></tr>
+            <tr><td>Eval judge</td><td>Different family</td><td>Avoids self-preference; calibrated against analysts</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="delivery">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">04 / Delivery</div>
+        <div>
+          <h2>Eight phases, seven gates, production in about 28 weeks</h2>
+          <p>Claude Code agents draft requirements, specs, code, tests and reports. Named owners approve at every gate. Data readiness and evaluation run alongside the build, so the gold set exists before the first agent.</p>
+        </div>
+      </div>
+      <div class="timeline" role="img" aria-label="Phase timeline from week 0 to week 34">
+        <div class="tl-grid">
+          <div></div>
+          <div class="tl-axis"><span>wk 0</span><span>wk 4</span><span>wk 8</span><span>wk 12</span><span>wk 16</span><span>wk 20</span><span>wk 24</span><span>wk 28</span><span>wk 32</span></div>
+
+          <div class="tl-name">0 Inception<small>intent, baseline, spike</small></div>
+          <div class="tl-track"><div class="tl-bar" style="grid-column:1 / 3"></div><span class="tl-gate" style="grid-column:3 / 6">G0</span></div>
+
+          <div class="tl-name">1 Discovery<small>mob elaboration, controls</small></div>
+          <div class="tl-track"><div class="tl-bar" style="grid-column:3 / 6"></div><span class="tl-gate" style="grid-column:6 / 9">G1</span></div>
+
+          <div class="tl-name">2 Data readiness<small>contracts, gold set</small></div>
+          <div class="tl-track"><div class="tl-bar" style="grid-column:4 / 11"></div><span class="tl-gate" style="grid-column:11 / 14">G2</span></div>
+
+          <div class="tl-name">3 Architecture<small>ADRs, agent cards, specs</small></div>
+          <div class="tl-track"><div class="tl-bar" style="grid-column:5 / 8"></div><span class="tl-gate" style="grid-column:8 / 11">G3</span></div>
+
+          <div class="tl-name">4 Construction<small>bolts in Claude Code</small></div>
+          <div class="tl-track"><div class="tl-bar ai" style="grid-column:7 / 25"></div><span class="tl-gate" style="grid-column:25 / 28">G4</span></div>
+
+          <div class="tl-name">5 Evaluation<small>held-out, red-team, 5x load</small></div>
+          <div class="tl-track"><div class="tl-bar ai" style="grid-column:9 / 27"></div><span class="tl-gate" style="grid-column:27 / 30">G5</span></div>
+
+          <div class="tl-name">6 Release<small>shadow, recommend, auto-close</small></div>
+          <div class="tl-track"><div class="tl-bar release" style="grid-column:25 / 33"></div><span class="tl-gate" style="grid-column:33 / 35">G6</span></div>
+
+          <div class="tl-name">7 Operations<small>AgentOps, drift, audits</small></div>
+          <div class="tl-track"><div class="tl-bar release" style="grid-column:29 / 37"></div></div>
+        </div>
+        <div class="tl-legend"><span><i class="sw"></i>Define and prepare</span><span><i class="sw ai"></i>Build and verify</span><span><i class="sw release"></i>Release and run</span></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Release</th><th>What the AI may do</th><th>Evidence to move up</th></tr></thead>
+          <tbody>
+            <tr><td>R1 Shadow</td><td>Recommend in the background; analysts decide everything</td><td>One full billing cycle; agreement reviewed per class</td></tr>
+            <tr><td>R2 Recommend</td><td>Propose cause and action; an analyst approves every case</td><td>Per class: 300+ cases, override 2% or less, 99% audited precision</td></tr>
+            <tr><td>R3 Auto-close</td><td>Close proven low-value classes; weekly blind audit</td><td>Steps down automatically on override spikes or a wrong closure</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="engineering">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">05 / Engineering</div>
+        <div>
+          <h2>Built to be measured, traced and audited</h2>
+          <p>The same thresholds gate every pull request, every release candidate and every model upgrade.</p>
+        </div>
+      </div>
+      <div class="eng">
+        <div class="col">
+          <h3>Release gate thresholds</h3>
+          <dl class="kv">
+            <dt>Recon precision / recall</dt><dd>99.5% / 99%</dd>
+            <dt>Retrieval recall@8</dt><dd>0.90</dd>
+            <dt>Triage macro-F1</dt><dd>0.85</dd>
+            <dt>Confidence calibration (ECE)</dt><dd>&lt; 0.05</dd>
+            <dt>Investigation correct</dt><dd>0.90</dd>
+            <dt>Impact error</dt><dd>0</dd>
+            <dt>Adversarial cases blocked</dt><dd>100%</dd>
+          </dl>
+        </div>
+        <div class="col">
+          <h3>Traceability chain</h3>
+          <div class="ids">
+            <span>record_uid</span><span>run_id</span><span>exception_id</span><span>case_id = trace root</span><span>model + tool request IDs</span><span>approver + timestamp</span><span>adjustment_id</span>
+          </div>
+          <p class="muted" style="font-size:.85rem;margin-top:12px">Written for every case to S3 with Object Lock; traces are sampled, the provenance record never is.</p>
+        </div>
+        <div class="col">
+          <h3>Service levels</h3>
+          <dl class="kv">
+            <dt>Bill-run recon</dt><dd>&lt; 2 h</dd>
+            <dt>Intraday break flagged (p95)</dt><dd>&lt; 5 min</dd>
+            <dt>Exceptions triaged</dt><dd>99% &lt; 4 h</dd>
+            <dt>Agent step (p95)</dt><dd>&lt; 20 s</dd>
+            <dt>Assistant first token (p95)</dt><dd>&lt; 3 s</dd>
+            <dt>Recovery (RTO / RPO)</dt><dd>4 h / 15 min</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="lessons">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">06 / Lessons</div>
+        <div>
+          <h2>How projects like this fail, and what prevents it</h2>
+          <p>The full list of anti-patterns, with scenarios and fixes, is reviewed at every gate.</p>
+        </div>
+      </div>
+      <div class="table-wrap lessons">
+        <table>
+          <thead><tr><th>Anti-pattern</th><th>What goes wrong</th><th>Prevention</th></tr></thead>
+          <tbody>
+            <tr><td>LLM on every transaction</td><td>About 20&times; cost, throttling at bill run, no audit trail</td><td>Rules engine first; track model calls per 1,000 transactions</td></tr>
+            <tr><td>Autonomy before evidence</td><td>One wrong auto-close destroys finance's trust</td><td>Three-release autonomy ladder decided at G0</td></tr>
+            <tr><td>Identity as an afterthought</td><td>Floods of false breaks; analysts ignore the queue</td><td>Identity coverage of 98% as a G2 gate</td></tr>
+            <tr><td>Model computes money</td><td>Arithmetic errors in financial explanations</td><td>Deterministic impact tool; number-diff check in CI</td></tr>
+            <tr><td>Tuning on the test set</td><td>Final scores overstate real quality</td><td>Held-out set opened once per release candidate, logged</td></tr>
+            <tr><td>Blaming the model for drift</td><td>Prompts retuned when a source system changed</td><td>Check source data, then business change, then the model</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="repo">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">07 / Repository</div>
+        <div>
+          <h2>Start from a working scaffold</h2>
+          <p>Documents, specs, Claude Code configuration, CI with an eval gate, and code skeletons with tests. Open it in Claude Code and begin Phase 0.</p>
+        </div>
+      </div>
+      <div class="repo">
+        <div>
+          <div class="code-head"><h3>Layout</h3></div>
+<pre>.
+├── CLAUDE.md          project context for Claude Code
+├── .claude/           settings, hooks, subagents, skills
+├── .github/           CI, eval gate, Pages, templates
+├── docs/              architecture, aSDLC phases, ADRs
+├── specs/             U1 to U7 unit specs and tasks
+├── features/          Gherkin acceptance scenarios
+├── data/              taxonomy, contracts, controls
+├── src/ra/            shared libs, agents, tools
+├── prompts/  config/  prompts, routing, thresholds
+├── evals/             harness, suites, fault library
+├── infra/             IaC by account and environment
+└── website/           this site</pre>
+        </div>
+        <div>
+          <div class="code-head"><h3>Quick start</h3><button class="copy" type="button" id="copy-btn">Copy</button></div>
+<pre id="quickstart">git clone https://github.com/your-org/revenue-assurance-ai.git
+cd revenue-assurance-ai
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -e ".[dev]"
+make test
+claude</pre>
+          <p class="muted" style="font-size:.86rem;margin-top:12px">Volumes, thresholds and costs shown here are planning assumptions. Replace them with your Phase 0 baseline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Revenue Assurance AI: reference architecture and agentic SDLC playbook</span>
+    <span>Amazon Bedrock &middot; AgentCore &middot; Claude Code</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById("copy-btn");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var text = document.getElementById("quickstart").innerText;
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = "Copied";
+          setTimeout(function () { btn.textContent = "Copy"; }, 1600);
+        }, function () { btn.textContent = "Select and copy"; });
+      } catch (e) { btn.textContent = "Select and copy"; }
+    });
+  })();
+</script>
+</body>
+</html>

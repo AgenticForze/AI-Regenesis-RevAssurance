@@ -1,0 +1,28 @@
+version: tax-v1.0
+root_causes:
+  RC01_rating_error: {definition: Rating priced usage incorrectly despite correct tariff, controls: [C2, C5]}
+  RC02_price_book_mismatch: {definition: Wrong or stale tariff version used, controls: [C5, C2]}
+  RC03_missing_usage: {definition: Usage captured but not rated or billed, controls: [C1, C2]}
+  RC04_duplicate_billing: {definition: Same usage or charge billed more than once, controls: [C2, C9]}
+  RC05_provisioned_not_billed: {definition: Active service with no recurring charge, controls: [C3]}
+  RC06_billed_not_provisioned: {definition: Charge for cancelled or never-active service, controls: [C3]}
+  RC07_discount_misapplied: {definition: Contract discount, bundle or commitment wrong, controls: [C4]}
+  RC08_tax_error: {definition: Wrong tax rate, jurisdiction or exemption, controls: [C2, C7]}
+  RC09_fx_error: {definition: Wrong FX rate or rate date, controls: [C2, C7, C8]}
+  RC10_timing_cutoff: {definition: Period mismatch across systems; self-heals, controls: [all]}
+  RC11_partner_variance: {definition: Partner statement differs from our usage, controls: [C8]}
+  RC12_identity_mismatch: {definition: Same entity under different keys, controls: [all]}
+  RC13_ledger_posting_error: {definition: Billed correctly, posted wrongly in ERP, controls: [C7]}
+  RC14_data_quality_false_break: {definition: Bad or late source data, not a real issue, controls: [all]}
+  RC99_other: {definition: None of the above; comment required, controls: [all]}
+actions: [rebill, credit, correct_catalog, fix_rating_config, fix_order_flow, fix_mapping,
+          journal_correction, dispute_partner, fix_feed, escalate, no_action]
+severity_bands_base_ccy:   # illustrative; confirm in mob session M3
+  S1: {min: 25000}
+  S2: {min: 5000, max: 25000}
+  S3: {min: 500, max: 5000}
+  S4: {max: 500}
+labeling_rules:
+  - One primary root cause per case; optional secondary
+  - Action must be consistent with the root cause
+  - RC99_other below 3% of labeled cases

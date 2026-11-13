@@ -1,0 +1,18 @@
+agent: triage
+purpose: Classify an exception group, propose root cause and action, decide escalate or auto-resolve candidate
+unit: U4
+requirements: [REQ-AI-007, REQ-AI-008, REQ-AI-009]
+autonomy: {R1: shadow, R2: recommend, R3: auto-close candidate if confident and low value}
+model:
+  tier: small
+  routing_key: triage.default
+  cascade: {to: mid, when: "confidence < 0.70 or schema_invalid or verifier_flag"}
+  max_output_tokens: 600
+budget: {input_tokens: 6000, calls: 2, wall_clock_s: 20}
+tools: [search_cases, get_tariff]
+output_schema: ra.shared.schemas.TriageResult
+prompt: prompts/triage/system.md
+guardrails: [prompt_attack, pii_redaction]
+handoff: {escalate_to: supervisor, human_queue_if: "S1 value or two failed attempts"}
+evals: [triage-accuracy, calibration-ece, schema-validity, injection-resistance, cost-per-call]
+owner: AI/ML lead

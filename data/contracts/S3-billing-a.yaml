@@ -1,0 +1,25 @@
+contract: S3-billing-a
+version: 1.0.0
+owner: {team: Billing A platform, contact_role: system owner S3}
+consumer: revenue-assurance
+delivery: {method: cdc, source: oracle.billing.invoice_line, landing: "s3://ra-bronze/S3/"}
+freshness: {max_lag_minutes: 30, measured_on: commit_ts}
+volume: {expected_rows_per_day: [450000, 900000], bill_run_peak_multiplier: 6}
+schema:
+  - {name: invoice_line_id, type: string, required: true, unique: true}
+  - {name: invoice_id, type: string, required: true}
+  - {name: account_id, type: string, required: true, pii: tokenized}
+  - {name: product_code, type: string, required: true, domain: catalog.product_code}
+  - {name: billing_period, type: string, pattern: "^[0-9]{6}$"}
+  - {name: quantity, type: "decimal(18,6)"}
+  - {name: uom, type: string, domain: [SEC, MB, EA, KWH]}
+  - {name: amount_net, type: "decimal(18,6)", required: true}
+  - {name: currency, type: string, domain: iso4217}
+  - {name: source_event_ref, type: string, required: false}
+  - {name: updated_at, type: timestamp, tz: UTC}
+quality:
+  - {check: null_rate, column: product_code, max: 0.001}
+  - {check: referential, column: account_id, target: S5.account_id, min_match: 0.995}
+  - {check: duplicate, columns: [invoice_line_id], max: 0}
+change_management: {notice_days: 15, breaking_change: new_major_version}
+on_breach: quarantine_batch_and_alert

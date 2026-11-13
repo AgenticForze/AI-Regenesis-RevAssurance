@@ -1,0 +1,17 @@
+{
+  "case_id": "CASE-...",
+  "trace_id": "...",
+  "release": "ra-YYYY.MM.DD-n",
+  "exceptions": ["EX-..."],
+  "run_ids": ["C2-YYYY-MM-recon-x.y.z-..."],
+  "evidence": {
+    "records": [{"uid": "S2:...", "snapshot": "iceberg:silver.rated_usage@..."}],
+    "chunks": [{"id": "KB-Catalog:...", "doc_version": "..."}],
+    "tool_calls": ["s3://ra-evidence/CASE-.../tools/01.json"]
+  },
+  "model_calls": [{"agent": "rootcause", "profile": "arn:...", "prompt": "ROOTCAUSE:NN", "request_id": "...", "tokens": {"in": 0, "out": 0, "cached": 0}}],
+  "proposal": {"root_cause": "RC02_price_book_mismatch", "action": "rebill", "impact_base_ccy": 0.0, "confidence": 0.0},
+  "verifier": {"result": "pass", "checks": ["citations", "recompute_impact", "policy"]},
+  "approval": {"by": "analyst:...", "at": "YYYY-MM-DDTHH:MM:SSZ", "second": null},
+  "posting": {"adjustment_id": "ADJ-...", "erp_doc": "...", "status": "pending"}
+}

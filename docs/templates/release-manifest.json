@@ -1,0 +1,14 @@
+{
+  "release": "ra-YYYY.MM.DD-n",
+  "engine": "recon-x.y.z",
+  "mappings": "map-vNN",
+  "controls": "ctl-vNN",
+  "agents": {"triage": "img:sha256:...", "supervisor": "img:sha256:...", "verifier": "img:sha256:..."},
+  "prompts": {"triage": "arn:...:prompt/TRIAGE:NN", "rootcause": "arn:...:prompt/ROOTCAUSE:NN"},
+  "routing": "routing-vNN",
+  "guardrail": "gr-ra:NN",
+  "kb": {"catalog": "idx-catalog-YYYY-MM-DD"},
+  "thresholds": "hitl-vNN",
+  "eval_report": "s3://ra-evals/reports/ra-YYYY.MM.DD-n.json",
+  "gold": "gold_vYYYY.MM.N"
+}

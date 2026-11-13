@@ -1,0 +1,16 @@
+agent: <name>
+purpose: <one sentence>
+unit: U<n>
+requirements: [REQ-...]
+autonomy: {R1: shadow, R2: recommend, R3: <rule or none>}
+model: {tier: small|mid|frontier, routing_key: <key>, cascade: {to: <tier>, when: <rule>}, max_output_tokens: 600}
+budget: {input_tokens: 6000, calls: 2, wall_clock_s: 20}
+inputs: {}
+tools: []            # read-only unless explicitly propose_*
+output_schema: schemas/<name>.v1.json
+prompt: prompts/<name>/system.md
+guardrails: [prompt_attack, pii_redaction]
+failure_modes: []
+handoff: {escalate_to: <agent>, human_queue_if: <rule>}
+evals: []
+owner: <role>

@@ -1,0 +1,8 @@
+# Step -> application inference profile. Changed only through the eval gate.
+triage.default:
+  profile: arn:aws:bedrock:us-east-1:111111111111:application-inference-profile/ra-triage-dev
+  max_output_tokens: 600
+  fallback: arn:aws:bedrock:us-east-1:111111111111:application-inference-profile/ra-triage-fallback-dev
+triage.cascade:
+  profile: arn:aws:bedrock:us-east-1:111111111111:application-inference-profile/ra-mid-dev
+  max_output_tokens: 800

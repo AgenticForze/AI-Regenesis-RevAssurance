@@ -1,0 +1,13 @@
+# Default reviewers
+*                         @your-org/ra-core
+
+docs/asdlc/               @your-org/ra-product
+docs/adr/                 @your-org/ra-architecture
+data/taxonomy.yaml        @your-org/ra-product @your-org/ra-analysts
+data/contracts/           @your-org/ra-data
+config/thresholds/        @your-org/ra-product @your-org/ra-governance
+config/routing/           @your-org/ra-ai
+prompts/                  @your-org/ra-ai
+evals/                    @your-org/ra-ai @your-org/ra-qa
+infra/                    @your-org/ra-platform
+.claude/                  @your-org/ra-architecture

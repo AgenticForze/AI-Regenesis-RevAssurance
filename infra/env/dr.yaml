@@ -1,0 +1,5 @@
+env: dr
+region: us-east-1
+secondary_region: us-west-2
+data: production
+bedrock_quota_profile: prod

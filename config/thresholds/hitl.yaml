@@ -1,0 +1,5 @@
+version: hitl-v1
+release: R1          # R1 shadow | R2 recommend | R3 auto-close per class
+cascade_confidence: 0.70
+dual_approval_above_base_ccy: 25000
+autoclose: {}        # filled per class and band only with an approved autonomy case
