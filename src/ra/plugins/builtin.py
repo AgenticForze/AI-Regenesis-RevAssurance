@@ -73,7 +73,7 @@ class Jira(_Http):
                            "description": json.dumps(payload, indent=2, default=str)[:30000],
                            "labels": ["revenue-assurance", event.replace(".", "-")]}}
         return self._send(self.config["base_url"].rstrip("/") + "/rest/api/2/issue", body,
-                          auth=(self.config.get("user", ""), self.secret("token_env")))
+                          auth=(self.secret("user_env"), self.secret("token_env")))
 
 
 class ServiceNow(_Http):

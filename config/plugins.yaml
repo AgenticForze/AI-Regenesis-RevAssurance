@@ -10,7 +10,7 @@ plugins:
     type: jira
     events: [case.opened]
     dry_run: true
-    config: {base_url: "https://your-company.atlassian.net", project: RA, user: "ra-bot@your-company.example", token_env: RA_JIRA_TOKEN}
+    config: {base_url: "https://your-company.atlassian.net", project: RA, user_env: RA_JIRA_USER, token_env: RA_JIRA_TOKEN}
   - name: itsm
     type: servicenow
     events: [adjustment.rejected]
