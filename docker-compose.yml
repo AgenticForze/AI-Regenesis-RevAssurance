@@ -1,0 +1,41 @@
+# Local stack: product + mock partner agent + OpenTelemetry Collector + Prometheus + Grafana + Jaeger.
+# First start:  docker compose up --build -d && docker compose exec app python -m ra.cli seed
+services:
+  app:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      RA_BASE_URL: http://localhost:8080
+      RA_PARTNER_A2A_URL: http://partner:8090
+      RA_PARTNER_A2A_TOKEN: ${PARTNER_TOKEN:?set PARTNER_TOKEN in .env}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      RA_DEMO_PASSWORD: ${RA_DEMO_PASSWORD:-}
+    volumes: ["ra-data:/data"]
+    depends_on: [otel-collector, partner]
+  partner:
+    build: .
+    command: ["python", "-m", "uvicorn", "ra.a2a.mock_partner:app", "--host", "0.0.0.0", "--port", "8090"]
+    environment:
+      PARTNER_BASE_URL: http://partner:8090
+      PARTNER_TOKEN: ${PARTNER_TOKEN:?set PARTNER_TOKEN in .env}
+    volumes: ["ra-data:/data:ro"]     # the mock reads the synthetic S10 statements
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes: ["./deploy/observability/otel-collector.yaml:/etc/otelcol/config.yaml:ro"]
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports: ["16686:16686"]
+  prometheus:
+    image: prom/prometheus:latest
+    ports: ["9090:9090"]
+    volumes:
+      - ./deploy/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3000:3000"]
+    volumes:
+      - ./deploy/observability/grafana-datasource.yml:/etc/grafana/provisioning/datasources/ds.yml:ro
+volumes:
+  ra-data:

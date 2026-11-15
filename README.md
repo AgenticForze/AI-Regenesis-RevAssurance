@@ -15,6 +15,36 @@ Reconcile **4 million transactions a day** across **10 billing and data systems*
 | Delivery | 8 aSDLC phases, 7 gates, ~28 weeks to production |
 | Website | [`website/index.html`](website/index.html), deployed by GitHub Pages |
 
+## The product: run it now
+
+`src/ra` is a working product, not a diagram. It runs on a laptop with no cloud account.
+
+```bash
+pip install -e ".[dev]"
+ra seed                      # demo users, one per role; prints a generated password
+ra run --period 2026-10      # reconcile ten synthetic sources, triage, investigate
+ra serve                     # console, API, MCP and A2A at http://localhost:8080
+```
+
+| Capability | What you get | Docs |
+| --- | --- | --- |
+| Authentication | OIDC bearer tokens (Cognito, Entra ID, Okta) or a built-in provider with lockout and rate limits | [security](docs/product/security.md) |
+| Authorization | Roles, business-unit scope, approval limits, four-eyes, human-only approval | [security](docs/product/security.md) |
+| Reconciliation | 9 deterministic controls over 10 sources | [product guide](docs/product/README.md) |
+| Agents | Triage, skill-driven investigation, independent verifier; nothing posts without a person | [agents](docs/product/agents-tools-skills.md) |
+| Skills | 8 investigation procedures in `skills/`, loaded per case | [skills](skills/README.md) |
+| Tools | 13 tools, one write tool (pending proposals only) | [tools](docs/product/agents-tools-skills.md) |
+| MCP | The same tools over streamable HTTP and stdio | [MCP and A2A](docs/product/mcp-a2a.md) |
+| A2A | Calls partner settlement agents; serves three skills to other agents | [MCP and A2A](docs/product/mcp-a2a.md) |
+| Plug-ins | ERP journal, Jira, ServiceNow, Slack, signed webhook, CSV source, example Teams package | [plug-ins](plugins/README.md) |
+| Auditing | Hash-chained, tamper-evident trail with before and after values | [auditing](docs/product/auditing.md) |
+| Observability | OpenTelemetry traces, Prometheus metrics and alerts, JSON logs | [observability](docs/product/observability.md) |
+| Reporting | Before/after: manual baseline vs product, and billed amount per adjustment | [reporting](docs/product/reporting.md) |
+
+Stand-ins to replace before production: synthetic data, the offline rule-based reasoner
+(Bedrock is one setting away but untested here), the mock partner agent, SQLite, and dry-run
+connectors. See [what is real and what is a stand-in](docs/product/README.md#what-is-real-and-what-is-a-stand-in).
+
 ## Architecture
 
 ```mermaid
@@ -68,12 +98,15 @@ Read [`docs/asdlc/anti-patterns.md`](docs/asdlc/anti-patterns.md) at every gate.
 ├── specs/                    # one spec folder per unit of work (U1-U7)
 ├── features/                 # Gherkin acceptance scenarios
 ├── data/                     # taxonomy, data contracts, control specs, mappings
-├── src/ra/                   # Python package: shared libs, agents, tools, recon
+├── src/ra/                   # the product: api, auth, recon, agents, tools, mcp, a2a, plugins, audit, obs, reporting
+├── skills/                   # runtime agent skills (SKILL.md per investigation procedure)
+├── plugins/                  # plug-in guide and an example third-party plug-in package
+├── deploy/                   # observability stack config (collector, Prometheus, alerts, Grafana)
 ├── prompts/                  # prompt templates (synced to Bedrock Prompt Management)
 ├── config/                   # routing table and HITL thresholds per environment
 ├── evals/                    # eval harness, suites, dataset manifests, fault library
 ├── infra/                    # IaC (CDK or Terraform) by account and environment
-├── tests/                    # unit tests
+├── tests/                    # unit and end-to-end tests (37)
 └── website/                  # project website (GitHub Pages)
 ```
 
@@ -84,7 +117,7 @@ git clone https://github.com/your-org/revenue-assurance-ai.git
 cd revenue-assurance-ai
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-make test          # unit tests, including the Claude Code hooks
+make test          # 37 tests: product end to end, plus the Claude Code hooks
 make eval-quick    # placeholder eval suite (wire to Bedrock in Phase 4)
 claude             # start Claude Code with the project context
 ```
@@ -93,7 +126,7 @@ Claude Code picks up `CLAUDE.md`, `.claude/settings.json`, the subagents in `.cl
 
 ## Status
 
-This repository is a **reference scaffold**: documents, specs, configuration and code skeletons ready for a team to start Phase 0. Figures such as volumes, thresholds and costs are planning assumptions to replace with your own baseline.
+Version 0.2.0 is a **working reference product** plus the delivery playbook. The product runs end to end on synthetic data with an offline reasoner; the production-scale data plane (Spark, Flink, AgentCore) is described in `docs/architecture/` and is not built here. Volumes, thresholds, prices and the before-side of the report are planning assumptions to replace with your own baseline.
 
 ## Contributing and security
 

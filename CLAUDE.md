@@ -19,7 +19,7 @@ Update this line at every gate: **Phase 0 - Inception** (gate G0 on day 10).
 - Write or update the acceptance test first; it must fail before you implement.
 - Never edit ADRs, agent cards, tool contracts or specs/*/design.md during construction;
   write problems to specs/<unit>/questions.md.
-- Every Bedrock call goes through src/ra/shared/llm_client.py (routing, budgets, tracing).
+- Every Bedrock call goes through src/ra/llm (ra.llm.call) (routing, budgets, tracing).
 - Agents never post money. Only propose_adjustment writes, to a pending state.
 - Commit messages: "<task-id>: <summary>".
 

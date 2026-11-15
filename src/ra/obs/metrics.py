@@ -1,0 +1,22 @@
+"""Prometheus metrics, exposed at /metrics. Names follow <domain>_<thing>_<unit>."""
+from prometheus_client import Counter, Gauge, Histogram
+
+HTTP_REQUESTS = Counter("ra_http_requests_total", "HTTP requests", ["method", "route", "status"])
+HTTP_LATENCY = Histogram("ra_http_request_seconds", "HTTP latency", ["route"])
+AUTH_EVENTS = Counter("ra_auth_events_total", "Logins and token checks", ["event"])
+AUTHZ_DECISIONS = Counter("ra_authz_decisions_total", "Policy decisions", ["action", "decision"])
+AUDIT_EVENTS = Counter("ra_audit_events_total", "Audit events", ["action", "decision"])
+RECORDS_RECONCILED = Counter("ra_records_reconciled_total", "Records checked", ["source"])
+EXCEPTIONS = Counter("ra_exceptions_total", "Exceptions raised", ["control", "severity"])
+TRIAGE = Counter("ra_triage_total", "Triage outcomes", ["root_cause", "route"])
+INVESTIGATIONS = Counter("ra_investigations_total", "Investigations", ["skill", "verdict"])
+TOOL_CALLS = Counter("ra_tool_calls_total", "Tool invocations", ["tool", "outcome"])
+TOOL_LATENCY = Histogram("ra_tool_seconds", "Tool latency", ["tool"])
+LLM_TOKENS = Counter("ra_llm_tokens_total", "Model tokens", ["step", "direction"])
+LLM_COST = Counter("ra_llm_cost_usd_total", "Model spend in USD", ["step"])
+ADJUSTMENTS = Counter("ra_adjustments_total", "Adjustment decisions", ["status"])
+RECOVERED = Counter("ra_recovered_amount_total", "Approved adjustment value", ["bu"])
+OUTBOX = Counter("ra_plugin_deliveries_total", "Plug-in deliveries", ["plugin", "outcome"])
+A2A_CALLS = Counter("ra_a2a_calls_total", "A2A calls", ["direction", "outcome"])
+OPEN_EXCEPTIONS = Gauge("ra_open_exceptions", "Exceptions not yet closed")
+PENDING_APPROVALS = Gauge("ra_pending_approvals", "Adjustments waiting for approval")

@@ -1,0 +1,28 @@
+groups:
+  - name: revenue-assurance
+    rules:
+      - alert: PluginDeliveriesFailing
+        expr: increase(ra_plugin_deliveries_total{outcome=~"failed|dead"}[15m]) > 5
+        labels: {severity: page}
+        annotations: {summary: "Plug-in {{ $labels.plugin }} is failing to deliver events"}
+      - alert: AuthorizationDenialsSpike
+        expr: increase(ra_authz_decisions_total{decision="deny"}[10m]) > 50
+        labels: {severity: ticket}
+        annotations: {summary: "Unusual number of denied actions: possible probing or a broken role mapping"}
+      - alert: LoginFailuresSpike
+        expr: increase(ra_auth_events_total{event=~"bad_credentials|locked"}[10m]) > 30
+        labels: {severity: page}
+        annotations: {summary: "Login failures are spiking"}
+      - alert: VerifierFailRateHigh
+        expr: sum(increase(ra_investigations_total{verdict="fail"}[1h])) / sum(increase(ra_investigations_total[1h])) > 0.2
+        labels: {severity: ticket}
+        annotations: {summary: "More than 20% of agent findings fail verification: check model, prompts or source data"}
+      - alert: ApprovalBacklog
+        expr: ra_pending_approvals > 200
+        for: 4h
+        labels: {severity: ticket}
+        annotations: {summary: "Approval queue is backing up"}
+      - alert: ModelSpendHigh
+        expr: increase(ra_llm_cost_usd_total[1d]) > 2500
+        labels: {severity: ticket}
+        annotations: {summary: "Daily model spend is above budget"}

@@ -1,0 +1,8 @@
+# The manual process this product replaces. These are placeholders: replace them with the
+# baseline you measure in Phase 0 before quoting any before/after number.
+sample_rate: 0.08            # share of accounts the manual review samples each month
+detection_rate: 0.70         # share of real breaks a reviewer finds in a sampled account
+controls_covered: [C2, C7]   # controls the manual process actually performs
+days_to_resolve: 21
+analyst_hours_per_case: 2.5
+analyst_hourly_cost: 65.0

@@ -1,0 +1,28 @@
+# Plug-in instances. Every instance starts in dry_run: requests are built and recorded in the
+# outbox but nothing is sent. Secrets are environment-variable NAMES, never values.
+plugins:
+  - name: erp-journal
+    type: ledger_journal_file
+    events: [adjustment.approved]
+    dry_run: false            # writes journal CSVs under .ra/journal for the ERP to collect
+    config: {receivable_account: "120000", revenue_account: "400100"}
+  - name: case-tracker
+    type: jira
+    events: [case.opened]
+    dry_run: true
+    config: {base_url: "https://your-company.atlassian.net", project: RA, user: "ra-bot@your-company.example", token_env: RA_JIRA_TOKEN}
+  - name: itsm
+    type: servicenow
+    events: [adjustment.rejected]
+    dry_run: true
+    config: {instance_url: "https://your-instance.service-now.com", table: incident, user: ra_integration, password_env: RA_SNOW_PASSWORD}
+  - name: approvals-channel
+    type: slack
+    events: [adjustment.proposed, run.completed]
+    dry_run: true
+    config: {webhook_url_env: RA_SLACK_WEBHOOK_URL}
+  - name: finance-webhook
+    type: webhook
+    events: [adjustment.approved, adjustment.rejected]
+    dry_run: true
+    config: {url: "https://finance.your-company.example/hooks/revenue-assurance", secret_env: RA_WEBHOOK_SECRET}

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ra-plugin-example"
+version = "0.1.0"
+description = "Example third-party plug-in for Revenue Assurance: Microsoft Teams notifications."
+requires-python = ">=3.11"
+dependencies = ["revenue-assurance-ai", "httpx>=0.27"]
+
+# This entry point is how the product discovers the plug-in. The name is the `type` used in
+# config/plugins.yaml.
+[project.entry-points."ra.plugins"]
+teams = "ra_plugin_example:TeamsNotifier"
+
+[tool.setuptools.packages.find]
+where = ["src"]

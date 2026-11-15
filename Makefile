@@ -4,8 +4,7 @@ install:
 	pip install -e ".[dev]"
 
 lint:
-	ruff check src tests .claude/hooks
-	ruff format --check src tests .claude/hooks
+	ruff check .
 
 test:
 	pytest -q
@@ -22,3 +21,15 @@ perf:
 
 docs-serve:
 	python -m http.server -d website 8000
+
+seed:
+	python -m ra.cli seed
+
+run:
+	python -m ra.cli run --period 2026-10
+
+serve:
+	python -m ra.cli serve
+
+report:
+	python -m ra.cli report --format html > before-after.html

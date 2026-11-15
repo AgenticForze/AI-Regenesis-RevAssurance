@@ -181,6 +181,17 @@ pre { margin: 0; background: var(--surface); border: 1px solid var(--line); bord
 .copy { font: 500 .8rem var(--font-body); background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
 footer { padding: 36px 0 48px; color: var(--muted); font-size: .86rem; }
 footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+/* product sections */
+.shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 24px; }
+.shots figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.shots img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--line); }
+.shots figcaption { padding: 12px 16px; font-size: .86rem; color: var(--muted); }
+.shots figcaption strong { color: var(--ink, inherit); }
+.eng .col ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .9rem; display: grid; gap: 6px; }
+.ba td:nth-child(2), .ba td:nth-child(3), .ba th:nth-child(2), .ba th:nth-child(3) { font-variant-numeric: tabular-nums; }
+.note { font-size: .86rem; color: var(--muted); margin-top: 14px; max-width: 80ch; }
+@media (max-width: 820px) { .shots { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -189,11 +200,13 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Revenue Assurance AI</a>
     <nav aria-label="Sections">
       <ul>
-        <li><a href="#approach">Approach</a></li>
+        <li><a href="#product">Product</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#integrations">Integrations</a></li>
+        <li><a href="#trust">Audit</a></li>
+        <li><a href="#reporting">Reporting</a></li>
         <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#agents">Agents</a></li>
         <li><a href="#delivery">Delivery</a></li>
-        <li><a href="#engineering">Engineering</a></li>
         <li><a href="#lessons">Lessons</a></li>
         <li><a href="#repo">Repository</a></li>
       </ul>
@@ -205,12 +218,12 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="hero">
     <div class="wrap">
       <div>
-        <div class="eyebrow">Reference architecture + agentic SDLC playbook</div>
+        <div class="eyebrow">Working product + reference architecture + delivery playbook</div>
         <h1>Reconcile 4 million transactions a day. Let AI work only on the <em>breaks</em>.</h1>
-        <p class="lead">A revenue assurance system for 10 billing and data systems on Amazon Bedrock and AgentCore, delivered with Claude Code. Deterministic rules match the bulk; agents investigate exceptions with evidence; analysts approve every adjustment until the data earns more autonomy.</p>
+        <p class="lead">A revenue assurance system for 10 billing and data systems on Amazon Bedrock and AgentCore, delivered with Claude Code. The repository includes a product you can run today: sign-in and policy, nine controls, agents with tools and skills, MCP, A2A, plug-ins, audit and reporting. Deterministic rules match the bulk; agents investigate exceptions with evidence; analysts approve every adjustment until the data earns more autonomy.</p>
         <div class="ctas">
           <a class="btn primary" href="https://github.com/your-org/revenue-assurance-ai">View the repository</a>
-          <a class="btn ghost" href="#delivery">See the delivery plan</a>
+          <a class="btn ghost" href="#product">See the product</a>
         </div>
       </div>
       <figure class="funnel" aria-labelledby="funnel-title" style="margin:0">
@@ -227,10 +240,180 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     </div>
   </section>
 
+
+  <section class="band" id="product">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">01 / Product</div>
+        <div>
+          <h2>A product you can run in five minutes</h2>
+          <p>One container serves the console, the API, an MCP server and an A2A endpoint. It runs on a laptop with synthetic data for ten sources and an offline reasoner, so nothing needs a cloud account. Point it at Amazon Bedrock and your identity provider with settings, not code changes.</p>
+        </div>
+      </div>
+      <div class="agent-flow">
+        <div class="stage"><div class="step">Step 1</div><h3>Reconcile</h3><p>Nine deterministic controls across ten sources. Each break carries the record IDs that prove it.</p><span class="tier">no model</span></div>
+        <div class="stage"><div class="step">Step 2</div><h3>Triage</h3><p>Root cause, action and confidence. An invalid answer is downgraded, never queued as a classification.</p><span class="tier">small model</span></div>
+        <div class="stage"><div class="step">Step 3</div><h3>Investigate</h3><p>One skill per root cause runs its tools, and asks the partner's agent when the other half of the data is theirs.</p><span class="tier">skills + tools + A2A</span></div>
+        <div class="stage"><div class="step">Step 4</div><h3>Verify</h3><p>The amount is recomputed from the records. Unknown evidence IDs or a wrong sign block the proposal.</p><span class="tier">no model</span></div>
+        <div class="stage human"><div class="step">Step 5</div><h3>Approve</h3><p>A person decides, within their limit, never on their own proposal. Approval queues the ERP posting.</p><span class="tier">human in the loop</span></div>
+      </div>
+      <div class="shots">
+        <figure><img src="assets/console-overview.png" alt="Console overview: leakage identified and recovered, accounts checked, match rate, model cost, a before and after table and exceptions by control" loading="lazy" width="1280" height="800"><figcaption><strong>Overview.</strong> Before and after on the same run, with value by control.</figcaption></figure>
+        <figure><img src="assets/console-exceptions.png" alt="Exceptions list with a selected partner variance case showing the skill used, the narrative and five passed verification checks" loading="lazy" width="1280" height="800"><figcaption><strong>Exceptions.</strong> Triage, the skill used, the evidence and each verifier check.</figcaption></figure>
+        <figure><img src="assets/console-approvals.png" alt="Approvals queue listing adjustments with billed amount before and after, who proposed each and approve or reject buttons" loading="lazy" width="1280" height="800"><figcaption><strong>Approvals.</strong> Billed amount before and after, who proposed it, who decided.</figcaption></figure>
+        <figure><img src="assets/console-audit.png" alt="Audit trail table with actor, action, resource, decision and detail, and a message that the hash chain is intact" loading="lazy" width="1280" height="800"><figcaption><strong>Audit.</strong> Every action and denial, with a one-click chain check.</figcaption></figure>
+      </div>
+      <p class="note">Screenshots are from a demo run on synthetic data: 6,554 records, 142 exceptions, 95.9% of records matched by rules, 14 investigations, all passing verification. Triage scores 100% on this data because the offline reasoner and the fault generator share one fault catalogue; that is not evidence about real data.</p>
+    </div>
+  </section>
+
+  <section class="band" id="security">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">02 / Security</div>
+        <div>
+          <h2>Who is calling, and what they may do</h2>
+          <p>Every request carries a signed token. Every action passes a default-deny policy. People, machine clients and the AI tier are separate identities, and the AI tier can never approve.</p>
+        </div>
+      </div>
+      <div class="eng">
+        <div class="col">
+          <h3>Authentication</h3>
+          <dl class="kv">
+            <dt>Production</dt><dd>OIDC (Cognito, Entra ID, Okta)</dd>
+            <dt>Local and demo</dt><dd>built-in provider</dd>
+            <dt>Token</dt><dd>RS256 JWT, 30 min</dd>
+            <dt>Machine clients</dt><dd>client credentials</dd>
+            <dt>Stored secrets</dt><dd>scrypt hashes</dd>
+            <dt>Lockout</dt><dd>5 failures, 5 min</dd>
+            <dt>Token endpoint limit</dt><dd>20 / min / address</dd>
+          </dl>
+        </div>
+        <div class="col">
+          <h3>Authorization rules</h3>
+          <ul>
+            <li><strong>Roles</strong> grant permissions; anything not granted is refused.</li>
+            <li><strong>Business unit:</strong> you see only the units in your scope, in lists, details and tool results.</li>
+            <li><strong>Approval limit:</strong> an amount above your limit is refused.</li>
+            <li><strong>Four-eyes:</strong> nobody approves their own proposal, admins included.</li>
+            <li><strong>Human-only:</strong> no agent or service can approve, whatever roles it holds.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3>Roles</h3>
+          <dl class="kv">
+            <dt>viewer</dt><dd>read</dd>
+            <dt>analyst</dt><dd>work cases, propose</dd>
+            <dt>approver</dt><dd>approve, reject</dd>
+            <dt>auditor</dt><dd>audit, traces</dd>
+            <dt>operator</dt><dd>runs, plug-ins</dd>
+            <dt>integration</dt><dd>MCP, A2A read</dd>
+            <dt>agent</dt><dd>tools, propose</dd>
+          </dl>
+        </div>
+      </div>
+      <p class="note">The OIDC path is implemented but has not been tested against a live identity provider. Test it against yours before go-live.</p>
+    </div>
+  </section>
+
+  <section class="band" id="integrations">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">03 / Integrations</div>
+        <div>
+          <h2>Tools, skills, MCP, A2A and plug-ins</h2>
+          <p>One tool registry serves the agents, the REST API and MCP clients, so every caller meets the same policy, row limits and audit trail. Skills hold the investigation procedures. Plug-ins carry events to the systems you already run.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Surface</th><th>What it is</th><th>What ships</th></tr></thead>
+          <tbody>
+            <tr><td>Tools</td><td>Typed functions that read source records and return the record IDs used</td><td>13 tools; one write tool, <span class="mono">propose_adjustment</span>, which only creates a pending proposal</td></tr>
+            <tr><td>Skills</td><td>A <span class="mono">SKILL.md</span> per root cause: when to use it, which tools it may call, the procedure</td><td>8 skills: usage gap, pricing, service billing, discount, ledger, partner variance, duplicate, general</td></tr>
+            <tr><td>MCP server</td><td>The same tools for Claude, IDEs and other agents</td><td>Streamable HTTP at <span class="mono">/mcp/</span> with bearer auth; stdio for local clients</td></tr>
+            <tr><td>A2A outbound</td><td>Ask a partner's settlement agent for the detail behind its statement</td><td>Used by the partner-variance skill; shares only account, period and skill name</td></tr>
+            <tr><td>A2A inbound</td><td>Other agents ask this product about exceptions</td><td>Agent card plus three skills: explain, summarize, investigate</td></tr>
+            <tr><td>Plug-ins</td><td>Sinks receive events; sources feed runs. Outbox delivery with retries and idempotency keys</td><td>ERP journal, Jira, ServiceNow, Slack, signed webhook, CSV source, example Teams package</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">A2A follows protocol version 0.3 (JSON-RPC: message/send, tasks/get, tasks/cancel); streaming and the 1.0 operation names are not implemented. HTTP connectors have been run in dry-run mode only, which is their default.</p>
+    </div>
+  </section>
+
+  <section class="band" id="trust">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">04 / Audit and observability</div>
+        <div>
+          <h2>Every action recorded, every hop traced</h2>
+          <p>One trace ID joins the HTTP response, the log lines, the spans and the audit events for a piece of work.</p>
+        </div>
+      </div>
+      <div class="eng">
+        <div class="col">
+          <h3>Audit trail</h3>
+          <ul>
+            <li>Sign-ins, denials with reasons, and every write.</li>
+            <li>Every tool call, by people, agents and MCP clients.</li>
+            <li>Before and after values on each decision.</li>
+            <li>What was shared with a partner agent.</li>
+            <li>SHA-256 hash chain: an edited or deleted row is found by the chain check.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3>Traces</h3>
+          <div class="ids">
+            <span>POST /api/runs</span><span>recon.controls</span><span>agent.triage &rarr; llm.triage</span><span>agent.investigate</span><span>tool.* &rarr; a2a.send</span><span>llm.investigate (tokens, cost)</span><span>plugin.deliver</span>
+          </div>
+        </div>
+        <div class="col">
+          <h3>Metrics and alerts</h3>
+          <dl class="kv">
+            <dt>Prometheus series</dt><dd>19</dd>
+            <dt>Alert rules</dt><dd>6</dd>
+            <dt>Verifier fail rate</dt><dd>alert &gt; 20%</dd>
+            <dt>Model spend</dt><dd>per step, per day</dd>
+            <dt>Plug-in deliveries</dt><dd>failed, dead</dd>
+            <dt>Denials, login failures</dt><dd>spike alerts</dd>
+          </dl>
+        </div>
+      </div>
+      <p class="note">A hash chain shows tampering; it does not prevent it. In production, also copy events to write-once storage.</p>
+    </div>
+  </section>
+
+  <section class="band" id="reporting">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">05 / Reporting</div>
+        <div>
+          <h2>Before and after, on the same run</h2>
+          <p>The report compares the manual, sample-based review with this product over identical data, so the difference is the process. It also lists the billed amount before and after each adjustment. Available as JSON, CSV and HTML.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="ba">
+          <thead><tr><th>Measure (demo run, synthetic data)</th><th>Before: manual sample</th><th>After: this product</th></tr></thead>
+          <tbody>
+            <tr><td>Accounts checked</td><td>8%</td><td>100%</td></tr>
+            <tr><td>Controls run</td><td>2</td><td>9</td></tr>
+            <tr><td>Exceptions found</td><td>2</td><td>113</td></tr>
+            <tr><td>Leakage identified</td><td>288</td><td>18,872</td></tr>
+            <tr><td>Recovered</td><td>288 (assumed)</td><td>10,138 approved; 3,723 pending</td></tr>
+            <tr><td>Evidence trail</td><td>Spreadsheets and email</td><td>Record IDs, tool calls, audit events</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">The before-column is modelled from placeholder assumptions in <span class="mono">config/baseline.yaml</span> (8% sample, 70% detection, two controls). It is not a measurement. Replace it with your own baseline before quoting any of these numbers.</p>
+    </div>
+  </section>
+
   <section class="band" id="approach">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">01 / Approach</div>
+        <div class="sec-num">06 / Approach</div>
         <div>
           <h2>Four rules the design never breaks</h2>
           <p>Revenue assurance moves money and answers to auditors. These rules keep an AI system inside those constraints at 4M transactions a day.</p>
@@ -248,7 +431,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="band" id="architecture">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">02 / Architecture</div>
+        <div class="sec-num">07 / Architecture</div>
         <div>
           <h2>Six layers, one direction of flow</h2>
           <p>Each production domain runs in its own AWS account. Workloads have no internet route; every service is reached through VPC endpoints.</p>
@@ -286,7 +469,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="band" id="agents">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">03 / Agents</div>
+        <div class="sec-num">08 / Agents</div>
         <div>
           <h2>Specialists gather evidence; a verifier and a person close the case</h2>
           <p>The supervisor plans and enforces a budget per case. Specialists run in parallel with their own allow-listed tools. Failed verification re-plans at most twice, then hands the case to an analyst with the evidence gathered so far.</p>
@@ -316,7 +499,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="band" id="delivery">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">04 / Delivery</div>
+        <div class="sec-num">09 / Delivery</div>
         <div>
           <h2>Eight phases, seven gates, production in about 28 weeks</h2>
           <p>Claude Code agents draft requirements, specs, code, tests and reports. Named owners approve at every gate. Data readiness and evaluation run alongside the build, so the gold set exists before the first agent.</p>
@@ -369,7 +552,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="band" id="engineering">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">05 / Engineering</div>
+        <div class="sec-num">10 / Engineering</div>
         <div>
           <h2>Built to be measured, traced and audited</h2>
           <p>The same thresholds gate every pull request, every release candidate and every model upgrade.</p>
@@ -413,7 +596,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="band" id="lessons">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">06 / Lessons</div>
+        <div class="sec-num">11 / Lessons</div>
         <div>
           <h2>How projects like this fail, and what prevents it</h2>
           <p>The full list of anti-patterns, with scenarios and fixes, is reviewed at every gate.</p>
@@ -438,10 +621,10 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
   <section class="band" id="repo">
     <div class="wrap">
       <div class="sec-head">
-        <div class="sec-num">07 / Repository</div>
+        <div class="sec-num">12 / Repository</div>
         <div>
-          <h2>Start from a working scaffold</h2>
-          <p>Documents, specs, Claude Code configuration, CI with an eval gate, and code skeletons with tests. Open it in Claude Code and begin Phase 0.</p>
+          <h2>Clone it, run it, then make it yours</h2>
+          <p>The product, 37 passing tests, documents, specs, Claude Code configuration and CI with an eval gate.</p>
         </div>
       </div>
       <div class="repo">
@@ -455,7 +638,11 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 ├── specs/             U1 to U7 unit specs and tasks
 ├── features/          Gherkin acceptance scenarios
 ├── data/              taxonomy, contracts, controls
-├── src/ra/            shared libs, agents, tools
+├── src/ra/            the product: api, auth, recon, agents,
+│                      tools, mcp, a2a, plugins, audit, obs
+├── skills/            runtime agent skills
+├── plugins/           plug-in guide and example package
+├── deploy/            collector, Prometheus, alerts
 ├── prompts/  config/  prompts, routing, thresholds
 ├── evals/             harness, suites, fault library
 ├── infra/             IaC by account and environment
@@ -468,7 +655,9 @@ cd revenue-assurance-ai
 python -m venv .venv &amp;&amp; source .venv/bin/activate
 pip install -e ".[dev]"
 make test
-claude</pre>
+ra seed
+ra run --period 2026-10
+ra serve</pre>
           <p class="muted" style="font-size:.86rem;margin-top:12px">Volumes, thresholds and costs shown here are planning assumptions. Replace them with your Phase 0 baseline.</p>
         </div>
       </div>
@@ -478,7 +667,7 @@ claude</pre>
 
 <footer>
   <div class="wrap">
-    <span>Revenue Assurance AI: reference architecture and agentic SDLC playbook</span>
+    <span>Revenue Assurance AI: working product, reference architecture and delivery playbook</span>
     <span>Amazon Bedrock &middot; AgentCore &middot; Claude Code</span>
   </div>
 </footer>

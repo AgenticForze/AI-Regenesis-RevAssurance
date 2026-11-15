@@ -26,3 +26,5 @@ cdk.out/
 
 # Logs
 logs/agent-runs/*.jsonl
+!.env.example
+.ra/
