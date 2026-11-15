@@ -113,8 +113,8 @@ Read [`docs/asdlc/anti-patterns.md`](docs/asdlc/anti-patterns.md) at every gate.
 ## Getting started
 
 ```bash
-git clone https://github.com/your-org/revenue-assurance-ai.git
-cd revenue-assurance-ai
+git clone https://github.com/AgenticForze/AI-Regenesis-RevAssurance.git
+cd AI-Regenesis-RevAssurance
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 make test          # 37 tests: product end to end, plus the Claude Code hooks
